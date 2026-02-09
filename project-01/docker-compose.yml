@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: node_learning_db
+    restart: always
+    environment:
+      POSTGRES_USER: vishnuvardhan
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: node_learning
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  api:
+    build: .
+    container_name: node_learning_api
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "3005:3005"
+    environment:
+      ACCESS_SECRET_KEY: my_secret@key
+      REFRESH_SECRET_KEY: my_refresh@key
+      DB_NAME: node_learning
+      DB_USER: vishnuvardhan
+      DB_PASSWORD: password
+      DATABASE_URL: "postgresql://vishnuvardhan:password@db:5432/node_learning"
+    command: sh -c "npx prisma migrate deploy && node server.js"
+volumes:
+  pgdata:
